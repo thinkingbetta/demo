@@ -1,4 +1,4 @@
-package com.accenture.salsaasyntax;
+package com.accenture.europeanunion;
 
 import static org.junit.Assert.assertTrue;
 
