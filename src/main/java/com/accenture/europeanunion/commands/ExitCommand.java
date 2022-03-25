@@ -1,7 +1,6 @@
 package com.accenture.europeanunion.commands;
 
 import com.accenture.europeanunion.entities.User;
-import com.accenture.salsasyntax.flowers.Commandos.ExitCommando;
 
 import java.util.ArrayList;
 
