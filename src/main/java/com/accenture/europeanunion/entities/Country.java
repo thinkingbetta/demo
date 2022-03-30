@@ -40,6 +40,11 @@ public class Country {
         return "Country name: " + countryName + "\nCapital city: " + capitalCity + "\nLanguage:" + language + "\nPopular Greeting: " + popularGreetings + "\nPopulation: " + population + "\nEntrance year: " + entranceYear ;
 
     }
-
+//    public String toString {
+//        getPopularGreetings() + ", welcome to " + getCountryName() + "! " +
+//                "\nThe capital is " + getCapitalCity() + ". \nThe official language is " + getLanguage() +
+//                " and the population is about " + getPopulation() + " people.\n" + c.getCountryName() +
+//                " entered the European Union in " + c.getEntranceYear() + "\n" );
+//    }
 
 }

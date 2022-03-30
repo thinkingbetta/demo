@@ -20,7 +20,7 @@ public class AddUserCommand extends Command {
     @Override
     public boolean run() {
 
-        String userName = scanner.nextLine();
+        String userName = "Betta";//scanner.nextLine();
 
         users.add(new User(userName));
 
