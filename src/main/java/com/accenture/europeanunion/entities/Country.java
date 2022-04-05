@@ -6,6 +6,7 @@ public class Country {
     private String language;
     private String popularGreetings;
     private int population;
+    //TODO di che tipo deve essere la data di entrata? int o meglio usare la classe della data?
     private int entranceYear;
 
     public Country(String countryName, String capitalCity, String language, String popularGreetings, int population, int entranceYear){
@@ -37,7 +38,7 @@ public class Country {
     }
 
     public String toString(){
-        return "Country name: " + countryName + "\nCapital city: " + capitalCity + "\nLanguage:" + language + "\nPopular Greeting: " + popularGreetings + "\nPopulation: " + population + "\nEntrance year: " + entranceYear ;
+        return "Country name: " + countryName + "\nCapital city: " + capitalCity + "\nLanguage:" + language + "\nPopular Greeting: " + popularGreetings + "\nPopulation: " + population + "\nEntrance year: " + entranceYear + "\n" ;
 
     }
 //    public String toString {

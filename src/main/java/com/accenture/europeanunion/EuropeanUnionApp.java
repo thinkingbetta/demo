@@ -4,7 +4,7 @@ import com.accenture.europeanunion.commands.*;
 import com.accenture.europeanunion.entities.Country;
 import com.accenture.europeanunion.entities.User;
 
-import java.sql.*;
+import java.sql.*;//connection, could also be written in POM
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Scanner;
@@ -16,14 +16,13 @@ public class EuropeanUnionApp {
         Connection connection = databaseConnector.getConnection();
 
 //        Connection connection = getConnection();
-//
-
 
         Scanner scanner = new Scanner(System.in);
+
         ArrayList<Country> countries = new ArrayList<>();
         ArrayList<User> users = new ArrayList<>();
 
-        Command addCountryCommand = new AddCountryCommand(scanner, countries);
+        Command addCountryCommand = new AddCountryCommand(scanner, connection);
         Command exitCommand = new ExitCommand(users);
         Command unknownCommand = new UnknownCommand();
         Command addUserCommand = new AddUserCommand(scanner, users);
@@ -35,9 +34,11 @@ public class EuropeanUnionApp {
         commands.add(countriesDescriptionCommand);
         commands.add(exitCommand);
 
+
         System.out.println("Welcome to European Union App!\nWhat's your name?");
         addUserCommand.run();
         howAreYouCommand.run();
+
 
         boolean suspend = false;
         while(!suspend){

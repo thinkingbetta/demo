@@ -41,9 +41,11 @@ public class CountriesDescriptionCommand extends Command{
             int id = resultSet.getInt("id");
             String countryName = resultSet.getString("country_name");
             String capitalName = resultSet.getString("country_capital");
+            int countryPopulation = resultSet.getInt("country_population");
+
            // System.out.println("id" + id + " country " + countryName + " capital " + capitalName);
 
-            Country country = new Country(countryName,capitalName, null, null,0,0);
+            Country country = new Country(countryName,capitalName, null, null, countryPopulation,0);
             countries.add(country);
 
         }
