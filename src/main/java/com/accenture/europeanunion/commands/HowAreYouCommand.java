@@ -15,7 +15,7 @@ public class HowAreYouCommand extends Command{
     @Override
     public boolean run() {
         System.out.println("How are you feeling today?");
-        String feeling = "fine";//scanner.nextLine().toLowerCase();
+        String feeling = "fine";//scanner.nextLine().toLowerCase().trim();
         ArrayList<String> happyFeelings = new ArrayList<>();
         happyFeelings.add("fine");
         happyFeelings.add("happy");

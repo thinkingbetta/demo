@@ -25,18 +25,18 @@ public class AddCountryCommand extends Command {
     public boolean run() throws SQLException {
 //TODO alla fine chiedere se tutto e' corretto, se si mandare avanti a "What do you want to do?" altrimenti riscrivere cio' che e' stato scritto nella Array<> List
         System.out.println("What is the name of your country?");
-        String countryName = scanner.nextLine();
+        String countryName = scanner.nextLine().trim();
         //TODO se il nome della country e' gia' inserito nel database allora dare errore
         System.out.println("What is the name of the capital?");
-        String capitalName = scanner.nextLine();
+        String capitalName = scanner.nextLine().trim();
         System.out.println("Which is the official language?");
-        String language = scanner.nextLine();
+        String language = scanner.nextLine().trim();
         System.out.println("Which is the most common greeting?");
-        String greeting = scanner.nextLine();
+        String greeting = scanner.nextLine().trim();
         System.out.println("How many people live here?");
-        int population = Integer.parseInt(scanner.nextLine());
+        int population = Integer.parseInt(scanner.nextLine().trim());
         System.out.println("When did it become part of the European Union?");
-        int entranceYear = Integer.parseInt(scanner.nextLine());
+        int entranceYear = Integer.parseInt(scanner.nextLine().trim());
 
         Country country = new Country(countryName,capitalName, language,greeting,population, entranceYear);
 
@@ -53,20 +53,19 @@ public class AddCountryCommand extends Command {
     }
 
     private int createCountry(Country country) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO country (country_name, country_capital, country_population) VALUES(?,?,?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO country (country_name, country_capital, country_population, country_greeting) VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
         PreparedStatement preparedStatementLanguage = connection.prepareStatement("INSERT INTO language (language_name) VALUES(?)", Statement.RETURN_GENERATED_KEYS);
 
         preparedStatement.setString(1,country.getCountryName());
         preparedStatement.setString(2, country.getCapitalCity());
         preparedStatement.setInt(3, country.getPopulation());
+        preparedStatement.setString(4, country.getPopularGreetings());
         preparedStatement.executeUpdate();
 
         preparedStatementLanguage.setString(1, country.getLanguage());
         preparedStatementLanguage.executeUpdate();
 
         PreparedStatement preparedStatementLanguageCountry = connection.prepareStatement("INSERT INTO country_language (country_id, language_id) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
-
-
 
         ResultSet generatedKeysCountry = preparedStatement.getGeneratedKeys();
         generatedKeysCountry.next();

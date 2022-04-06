@@ -46,7 +46,7 @@ public class EuropeanUnionApp {
             for (Command c : commands) {
                 System.out.println(c.getCommandName());
             }
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().trim();
 
             boolean commandFound = false;
             for (Command command : commands) {
