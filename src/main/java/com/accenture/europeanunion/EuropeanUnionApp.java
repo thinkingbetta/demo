@@ -3,10 +3,10 @@ package com.accenture.europeanunion;
 import com.accenture.europeanunion.commands.*;
 import com.accenture.europeanunion.entities.Country;
 import com.accenture.europeanunion.entities.User;
+import com.accenture.europeanunion.perseverance.DatabaseConnector;
 
 import java.sql.*;//connection, could also be written in POM
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.Scanner;
 
 public class EuropeanUnionApp {

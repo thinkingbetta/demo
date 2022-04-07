@@ -1,4 +1,4 @@
-package com.accenture.europeanunion;
+package com.accenture.europeanunion.perseverance;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

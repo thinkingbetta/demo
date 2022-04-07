@@ -16,6 +16,8 @@ public class CountriesDescriptionCommand extends Command{
     private Connection connection;
 
 
+
+
     public CountriesDescriptionCommand(Connection connection){
         this.connection = connection;
     }

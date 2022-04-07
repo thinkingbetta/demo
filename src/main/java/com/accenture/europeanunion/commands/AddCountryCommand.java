@@ -53,8 +53,12 @@ public class AddCountryCommand extends Command {
     }
 
     private int createCountry(Country country) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO country (country_name, country_capital, country_population, country_greeting) VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-        PreparedStatement preparedStatementLanguage = connection.prepareStatement("INSERT INTO language (language_name) VALUES(?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO country (country_name," +
+                " country_capital, country_population, country_greeting) VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatementLanguage = connection.prepareStatement("INSERT INTO language (language_name)" +
+                " VALUES(?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatementYear = connection.prepareStatement("INSERT INTO year (year)" +
+                " VALUES(?)", Statement.RETURN_GENERATED_KEYS);
 
         preparedStatement.setString(1,country.getCountryName());
         preparedStatement.setString(2, country.getCapitalCity());
@@ -65,7 +69,15 @@ public class AddCountryCommand extends Command {
         preparedStatementLanguage.setString(1, country.getLanguage());
         preparedStatementLanguage.executeUpdate();
 
-        PreparedStatement preparedStatementLanguageCountry = connection.prepareStatement("INSERT INTO country_language (country_id, language_id) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement preparedStatementLanguageCountry = connection.prepareStatement("INSERT INTO country_language" +
+                " (country_id, language_id) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
+
+        preparedStatementYear.setInt(1,country.getEntranceYear());
+        preparedStatementYear.executeUpdate();
+
+        PreparedStatement preparedStatementYearCountry = connection.prepareStatement("INSERT INTO year_country" +
+                " (year_id, country_id) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
+
 
         ResultSet generatedKeysCountry = preparedStatement.getGeneratedKeys();
         generatedKeysCountry.next();
@@ -73,11 +85,20 @@ public class AddCountryCommand extends Command {
 
         ResultSet generatedKeysLanguage= preparedStatementLanguage.getGeneratedKeys();
         generatedKeysLanguage.next();
-        int generatedKeysLanguage1 = generatedKeysLanguage.getInt(1);
+        int generatedKeyLanguage = generatedKeysLanguage.getInt(1);
 
         preparedStatementLanguageCountry.setInt(1,generatedKeyCountry );
-        preparedStatementLanguageCountry.setInt(2,generatedKeysLanguage1);
+        preparedStatementLanguageCountry.setInt(2,generatedKeyLanguage);
         preparedStatementLanguageCountry.executeUpdate();
+
+        ResultSet generatedKeysYear= preparedStatementYear.getGeneratedKeys();
+        generatedKeysYear.next();
+        int generatedKeyYear = generatedKeysYear.getInt(1);
+
+        preparedStatementYearCountry.setInt(1,generatedKeyYear );
+        preparedStatementYearCountry.setInt(2,generatedKeyCountry);
+        preparedStatementYearCountry.executeUpdate();
+
 
         System.out.println("my generated key is " + generatedKeyCountry);
 

@@ -37,6 +37,7 @@ public class Country {
         return entranceYear;
     }
 
+//TODO come mettere questa toString nella country service?
     public String toString(){
         return "Country name: " + countryName + "\nCapital city: " + capitalCity + "\nLanguage:" + language + "\nPopular Greeting: " + popularGreetings + "\nPopulation: " + population + "\nEntrance year: " + entranceYear + "\n" ;
 
