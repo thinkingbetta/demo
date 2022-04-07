@@ -4,7 +4,7 @@ package com.accenture.europeanunion.commands;
 import com.accenture.europeanunion.entities.Country;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class AddCountryCommand extends Command {
@@ -23,48 +23,93 @@ public class AddCountryCommand extends Command {
 
     @Override
     public boolean run() throws SQLException {
-//TODO alla fine chiedere se tutto e' corretto, se si mandare avanti a "What do you want to do?" altrimenti riscrivere cio' che e' stato scritto nella Array<> List
         System.out.println("What is the name of your country?");
-        String countryName = scanner.nextLine().trim();
-        //TODO se il nome della country e' gia' inserito nel database allora dare errore
-        System.out.println("What is the name of the capital?");
-        String capitalName = scanner.nextLine().trim();
-        System.out.println("Which is the official language?");
-        String language = scanner.nextLine().trim();
-        System.out.println("Which is the most common greeting?");
-        String greeting = scanner.nextLine().trim();
-        System.out.println("How many people live here?");
-        int population = Integer.parseInt(scanner.nextLine().trim());
-        System.out.println("When did it become part of the European Union?");
-        int entranceYear = Integer.parseInt(scanner.nextLine().trim());
+        String countryName = scanner.nextLine().trim().toUpperCase();
 
-        Country country = new Country(countryName,capitalName, language,greeting,population, entranceYear);
+        PreparedStatement getStatement = connection.prepareStatement("SELECT id FROM country WHERE country_name = ?");
+        getStatement.setString(1, countryName);
+        ResultSet countryNameResult = getStatement.executeQuery();
 
-        int countryID = createCountry(country);
+        if (countryNameResult.next()) {
+            throw new IllegalArgumentException(countryName + " already existing, enter another country!");
+        } else {
+            System.out.println("What is the name of the capital?");
+            String capitalName = scanner.nextLine().trim().toUpperCase();
+            System.out.println("Which is the official language?");
+            String language = scanner.nextLine().trim().toUpperCase();
+            System.out.println("Which is the most common greeting?");
+            String greeting = scanner.nextLine().trim().toUpperCase();
+            System.out.println("How many people live here?");
+            int population = Integer.parseInt(scanner.nextLine().trim());
+            System.out.println("When did it become part of the European Union?");
+            int entranceYear = Integer.parseInt(scanner.nextLine().trim());
 
-        //countries.add(new Country(countryName, capitalName, language, greeting, population, entranceYear));
+            System.out.println(countryName + " " + capitalName + " " + language + " " + greeting + population + " " + entranceYear +
+                    "\n Is everything correct?[true or false]");
+            Boolean input = Boolean.valueOf(scanner.nextLine().trim().toLowerCase());
+            if (input.equals(true)) {
+                Country country = new Country(countryName, capitalName, language, greeting, population, entranceYear);
 
+                int countryID = createCountry(country);
 
-        System.out.println("The following was added");
-        //TODO cotruire una toString prendendo tutti i dati relativi all'ultima country aggiunta, magari e' utile la countryID generata
-        System.out.println(country.toString());
-
+                System.out.println("The following was added:\n" + country);
+            } else {
+                System.out.println("Country was not added.");
+            }
+        }
         return value;
     }
 
     private int createCountry(Country country) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO country (country_name," +
-                " country_capital, country_population, country_greeting) VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-        PreparedStatement preparedStatementLanguage = connection.prepareStatement("INSERT INTO language (language_name)" +
-                " VALUES(?)", Statement.RETURN_GENERATED_KEYS);
+
+
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO country (country_name," +
+                    " country_capital, country_population, country_greeting) VALUES(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, country.getCountryName());
+            preparedStatement.setString(2, country.getCapitalCity());
+            preparedStatement.setInt(3, country.getPopulation());
+            preparedStatement.setString(4, country.getPopularGreetings());
+            preparedStatement.executeUpdate();
+
+            ResultSet generatedKeysCountry = preparedStatement.getGeneratedKeys();
+            generatedKeysCountry.next();
+            int generatedKeyCountry = generatedKeysCountry.getInt(1);
+
+            System.out.println("my generated key is " + generatedKeyCountry);
+
+            createLanguageCountry(country, generatedKeyCountry);
+
+            createYearCountry(country, generatedKeyCountry);
+
+
+        return generatedKeyCountry;
+    }
+    //TODO controlla se anno o lingue esistono ancora, se si prendere id e fare connessione nella tabella year_country country_language,
+    // se no creare nuove voci nella tabella language e year e andare avanti
+    private void createYearCountry(Country country, int generatedKeyCountry) throws SQLException {
         PreparedStatement preparedStatementYear = connection.prepareStatement("INSERT INTO year (year)" +
                 " VALUES(?)", Statement.RETURN_GENERATED_KEYS);
 
-        preparedStatement.setString(1,country.getCountryName());
-        preparedStatement.setString(2, country.getCapitalCity());
-        preparedStatement.setInt(3, country.getPopulation());
-        preparedStatement.setString(4, country.getPopularGreetings());
-        preparedStatement.executeUpdate();
+        preparedStatementYear.setInt(1, country.getEntranceYear());
+        preparedStatementYear.executeUpdate();
+
+        PreparedStatement preparedStatementYearCountry = connection.prepareStatement("INSERT INTO year_country" +
+                " (year_id, country_id) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
+
+
+        ResultSet generatedKeysYear= preparedStatementYear.getGeneratedKeys();
+        generatedKeysYear.next();
+        int generatedKeyYear = generatedKeysYear.getInt(1);
+
+        preparedStatementYearCountry.setInt(1,generatedKeyYear );
+        preparedStatementYearCountry.setInt(2, generatedKeyCountry);
+        preparedStatementYearCountry.executeUpdate();
+    }
+
+    private void createLanguageCountry(Country country, int generatedKeyCountry) throws SQLException {
+        PreparedStatement preparedStatementLanguage = connection.prepareStatement("INSERT INTO language (language_name)" +
+                " VALUES(?)", Statement.RETURN_GENERATED_KEYS);
 
         preparedStatementLanguage.setString(1, country.getLanguage());
         preparedStatementLanguage.executeUpdate();
@@ -72,37 +117,13 @@ public class AddCountryCommand extends Command {
         PreparedStatement preparedStatementLanguageCountry = connection.prepareStatement("INSERT INTO country_language" +
                 " (country_id, language_id) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
 
-        preparedStatementYear.setInt(1,country.getEntranceYear());
-        preparedStatementYear.executeUpdate();
-
-        PreparedStatement preparedStatementYearCountry = connection.prepareStatement("INSERT INTO year_country" +
-                " (year_id, country_id) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS);
-
-
-        ResultSet generatedKeysCountry = preparedStatement.getGeneratedKeys();
-        generatedKeysCountry.next();
-        int generatedKeyCountry = generatedKeysCountry.getInt(1);
-
         ResultSet generatedKeysLanguage= preparedStatementLanguage.getGeneratedKeys();
         generatedKeysLanguage.next();
         int generatedKeyLanguage = generatedKeysLanguage.getInt(1);
 
-        preparedStatementLanguageCountry.setInt(1,generatedKeyCountry );
+        preparedStatementLanguageCountry.setInt(1, generatedKeyCountry);
         preparedStatementLanguageCountry.setInt(2,generatedKeyLanguage);
         preparedStatementLanguageCountry.executeUpdate();
-
-        ResultSet generatedKeysYear= preparedStatementYear.getGeneratedKeys();
-        generatedKeysYear.next();
-        int generatedKeyYear = generatedKeysYear.getInt(1);
-
-        preparedStatementYearCountry.setInt(1,generatedKeyYear );
-        preparedStatementYearCountry.setInt(2,generatedKeyCountry);
-        preparedStatementYearCountry.executeUpdate();
-
-
-        System.out.println("my generated key is " + generatedKeyCountry);
-
-        return generatedKeyCountry;
     }
 
     @Override
