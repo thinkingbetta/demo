@@ -1,10 +1,10 @@
 package com.accenture.europeanunion.commands;
 
 
+import com.accenture.europeanunion.CLI.ScannerFormatting;
 import com.accenture.europeanunion.entities.Country;
 
 import java.sql.*;
-import java.util.Locale;
 import java.util.Scanner;
 
 public class AddCountryCommand extends Command {
@@ -12,8 +12,10 @@ public class AddCountryCommand extends Command {
     private Scanner scanner;
     private Connection connection;
     private final boolean value = false;
+    private ScannerFormatting scannerFormatting;
 
-    public AddCountryCommand(Scanner scanner, Connection connection){
+    public AddCountryCommand(Scanner scanner, Connection connection, ScannerFormatting scannerFormatting){
+        this.scannerFormatting = scannerFormatting;
         if(connection == null){
             throw  new IllegalArgumentException("Connection must not be null");
         }
@@ -24,7 +26,7 @@ public class AddCountryCommand extends Command {
     @Override
     public boolean run() throws SQLException {
         System.out.println("What is the name of your country?");
-        String countryName = getFormattedString();
+        String countryName = scannerFormatting.getFormattedString(scanner);
 
         PreparedStatement getStatement = connection.prepareStatement("SELECT id FROM country WHERE country_name = ?");
         getStatement.setString(1, countryName);
@@ -34,15 +36,15 @@ public class AddCountryCommand extends Command {
             throw new IllegalArgumentException(countryName + " already existing, enter another country!");
         } else {
             System.out.println("What is the name of the capital?");
-            String capitalName = getFormattedString();
+            String capitalName = scannerFormatting.getFormattedString(scanner);
             System.out.println("Which is the official language?");
-            String language = getFormattedString();
+            String language = scannerFormatting.getFormattedString(scanner);
             System.out.println("Which is the most common greeting?");
-            String greeting = getFormattedString();
+            String greeting = scannerFormatting.getFormattedString(scanner);
             System.out.println("How many people live here?");
-            int population = Integer.parseInt(scanner.nextLine().trim());
+            int population = scannerFormatting.getFormattedInt(scanner);
             System.out.println("When did it become part of the European Union?");
-            int entranceYear = Integer.parseInt(scanner.nextLine().trim());
+            int entranceYear = scannerFormatting.getFormattedInt(scanner);
 
             System.out.println(countryName + " " + capitalName + " " + language + " " + greeting + " "  + population + " " + entranceYear +
                     "\nIs everything correct?[true or false]");
@@ -60,14 +62,8 @@ public class AddCountryCommand extends Command {
         return value;
     }
 
-    private String getFormattedString() {
-        String string = scanner.nextLine().trim();
 
-        String firstLetter = string.substring(0, 1).toUpperCase();
-        String restOfTheWord = string.substring(1).toLowerCase();
 
-        return firstLetter+restOfTheWord;
-    }
 
     private int createCountry(Country country) throws SQLException {
 

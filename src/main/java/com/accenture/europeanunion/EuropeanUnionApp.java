@@ -1,5 +1,6 @@
 package com.accenture.europeanunion;
 
+import com.accenture.europeanunion.CLI.ScannerFormatting;
 import com.accenture.europeanunion.commands.*;
 import com.accenture.europeanunion.entities.Country;
 import com.accenture.europeanunion.entities.User;
@@ -18,11 +19,13 @@ public class EuropeanUnionApp {
 //        Connection connection = getConnection();
 
         Scanner scanner = new Scanner(System.in);
+        ScannerFormatting scannerFormatting = new ScannerFormatting();
 
         ArrayList<Country> countries = new ArrayList<>();
         ArrayList<User> users = new ArrayList<>();
 
-        Command addCountryCommand = new AddCountryCommand(scanner, connection);
+
+        Command addCountryCommand = new AddCountryCommand(scanner, connection, scannerFormatting);
         Command exitCommand = new ExitCommand(users);
         Command unknownCommand = new UnknownCommand();
         Command addUserCommand = new AddUserCommand(scanner, users);
